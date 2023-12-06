@@ -1,0 +1,91 @@
+"""
+"""
+
+import smtplib
+import random
+import re
+from twilio.rest import Client
+
+class OTPService:
+    """
+    Class docstring: OTPService class handles the generation and sending of OTPs.
+    """
+
+
+    def _init_(self, account_sid, auth_token, twilio_number):
+        self.account_sid = account_sid
+        self.auth_token = auth_token
+        self.twilio_number = twilio_number
+
+    def validate_mobile_no(self, mobile_no):
+        """
+        Validates a mobile number.
+        """
+        return len(mobile_no) == 10 and mobile_no.isdigit()
+
+    def validate_email(self, email):
+        """
+        Validates an email address.
+        """
+        validating_condition = r"^[\w\.-]+@[\w\.-]+\.\w+$"
+        return bool(re.search(validating_condition, email))
+
+    def generate_otp(self):
+        """
+        Generates a 6-digit OTP.
+        """
+        
+        return ''.join([str(random.randint(0,9))for i in range(6)])
+
+    def send_email(self, email, otp):
+        """
+        Sends the OTP via email.
+        """
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login('ommhatre2003@gmail.com', 'cjtzttnalqeaughf')
+        SMS = f'Your One Time Password is {otp}'
+        server.sendmail('ommhatre2003@gmail.com', email, SMS)
+        server.quit()
+
+    def send_otp_over_mobile(self, mobile_no, otp):
+        """
+        Sends the OTP via Twilio SMS.
+        """
+        client = Client(self.account_sid, self.auth_token)
+        message_body = f'Your One Time Password is {otp}'
+        SMS= client.messages.create(
+            body=message_body,
+            from_=self.twilio_number,
+            to=f'+91{mobile_no}',
+        )
+        print(SMS.body)
+
+    def send_otp(self, mobile_no, email):
+        """
+        Sends OTP via the chosen method (SMS and/or email).
+        """
+        otp = self.generate_otp()
+
+        if self.validate_mobile_no(mobile_no):
+            self.send_otp_over_mobile(mobile_no, otp)
+        else:
+            print("Invalid Mobile number")
+
+        if self.validate_email(email):
+            self.send_email(email, otp)
+        else:
+            print("Invalid Email")
+
+
+if _name_ == "_main_":
+    account_sid = "AC83269abe6b5473c7879cfa96bd9e2d3c"
+    auth_token = "35dccfab0fcc6644e371ec283df6b6ef"
+    twilio_number = '+14705162775'
+
+    OTP_SERVICE = OTPService(account_sid, auth_token, twilio_number)
+
+    MOBILE_NO = input("Enter the Mobile number:")
+    EMAIL = input("Enter the Email:")
+
+    OTP_SERVICE.send_otp(MOBILE_NO, EMAIL)
