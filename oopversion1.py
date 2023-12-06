@@ -67,6 +67,9 @@ class OTPService:
         """
         otp = self.generate_otp()
 
+
+
+
         if self.validate_mobile_no(mobile_no):
             self.send_otp_over_mobile(mobile_no, otp)
         else:
