@@ -79,4 +79,6 @@ if __name__ == "__main__":
     EMAIL_USER = EmailUser(input("Enter the Email:"))
 
     OTP_SERVICE.send_otp_to_mobile_user(MOBILE_USER)
+
+    
     OTP_SERVICE.send_otp_to_email_user(EMAIL_USER)
